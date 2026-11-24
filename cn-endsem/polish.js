@@ -354,7 +354,9 @@
   const notesSections = sections.filter(section => !['allmcq', 'numericals', 'mcqs'].includes(section.id));
 
   // Replace the old multi-row category strip with a wrapped, compact notes navigator.
-  const primaryNavLinks = $$('.nav-pill', firstNav);
+  // Bind section navigation only to the top-level topic links. The More topics
+  // summary is a disclosure control, so leave its native click behavior intact.
+  const primaryNavLinks = $$('.nav-pill[data-topic-id]', firstNav).filter(link => !link.closest('.nav-more-panel'));
   primaryNavLinks.forEach(link => {
     const id = link.dataset.topicId;
     link.addEventListener('click', event => {
