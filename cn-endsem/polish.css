@@ -69,6 +69,7 @@ button, .nav-pill, .tab, .reveal-btn, .mcq-chip, .hub-card { border-radius: 2px 
 .hero-title .ico { stroke: var(--text) !important; }
 .hero-sub { color: var(--text3) !important; font-family: inherit !important; }
 .hero-right { gap: 7px !important; }
+.topic-progress-display { padding: 7px 10px; color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: 2px; font-size: 13px; white-space: nowrap; }
 .ui-icon { width: 18px; height: 18px; flex: 0 0 18px; display: inline-block; }
 .hero-right > button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
 .hero-right > button, .practice-mode-button, .view-tab {
@@ -166,6 +167,9 @@ button, .nav-pill, .tab, .reveal-btn, .mcq-chip, .hub-card { border-radius: 2px 
   text-decoration: none;
 }
 .nav-pill:hover, .nav-pill.active { color: #151515 !important; background: #FFBB1E !important; border-color: #FFBB1E !important; }
+.nav-pill.done-pill { position: relative; }
+.topic-done-mark { position: absolute; top: -5px; right: -5px; display: grid; place-items: center; width: 15px; height: 15px; color: #fff; background: #1F6B3A; border: 1px solid #fff; border-radius: 50%; }
+.topic-done-mark .ui-icon { width: 10px; height: 10px; flex-basis: 10px; stroke-width: 2.4; }
 .nav-short { display: none; }
 .nav-more summary .ui-icon { width: 13px; height: 13px; }
 .lec-label { display: none !important; }
@@ -196,6 +200,13 @@ button, .nav-pill, .tab, .reveal-btn, .mcq-chip, .hub-card { border-radius: 2px 
   cursor: default !important;
 }
 .section-header:hover { background: #EEE8D4 !important; }
+.section-title { flex: 1 1 auto; min-width: 0; }
+.topic-header-actions { display: inline-flex; align-items: center; gap: 9px; flex: none; }
+.topic-done-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 28px; padding: 4px 8px; color: #151515; background: #fff; border: 1px solid var(--border); border-radius: 2px; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.topic-done-button:hover { background: #FFBB1E; border-color: #FFBB1E; }
+.topic-done-button.done { color: #fff; background: #1F6B3A; border-color: #1F6B3A; }
+.topic-done-button.done:hover { background: #18572e; border-color: #18572e; }
+.topic-done-button .ui-icon { width: 14px; height: 14px; flex-basis: 14px; stroke-width: 2.3; }
 .section-title { color: var(--text) !important; font-size: 17px !important; }
 .section-title > span:first-child {
   display: inline-grid;
@@ -309,6 +320,7 @@ td { border-color: var(--border) !important; }
   .hero-sub { font-size: 11px !important; }
   .hero-right { display: grid !important; grid-template-columns: 1fr 1fr; width: 100%; }
   .hero-right .score-display { grid-column: 1 / -1; }
+  .hero-right .topic-progress-display { grid-column: 1 / -1; }
   .hero-right .search-bar { grid-column: 1 / -1; order: 0 !important; min-width: 0; }
   .hero-right .search-bar input { width: 100%; }
   .hero-right > button { min-height: 30px; padding: 5px 7px !important; font-size: 12px !important; }
@@ -319,6 +331,8 @@ td { border-color: var(--border) !important; }
   .main, .practice-view { padding: 9px !important; }
   .section-body { padding: 10px !important; }
   .section-header { padding: 8px !important; }
+  .topic-header-actions { gap: 5px; }
+  .topic-done-button { min-height: 25px; padding: 3px 5px; font-size: 11px; }
   .section-title { font-size: 15px !important; }
   .quiz-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hub-card { min-width: 0; padding: 8px; }

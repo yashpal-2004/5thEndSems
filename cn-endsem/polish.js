@@ -7,6 +7,7 @@
     const paths = {
       search: '<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',
       chevron: '<path d="m7 10 5 5 5-5"/>',
+      box: '<rect x="4" y="4" width="16" height="16" rx="2"/>',
       check: '<path d="m5 12 4 4L19 6"/>',
       cross: '<path d="m6 6 12 12M18 6 6 18"/>',
       reset: '<path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/>',
@@ -352,6 +353,65 @@
   numericHeading.textContent = 'Worked examples by lecture';
   extras.prepend(numericHeading);
   const notesSections = sections.filter(section => !['allmcq', 'numericals', 'mcqs'].includes(section.id));
+
+  // Keep topic completion separate from quiz answers, following the MCA dashboard pattern.
+  const topicCompletionKey = 'cn_endsem_completed_topics';
+  const topicIds = notesSections.map(section => section.id);
+  let completedTopics = {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(topicCompletionKey) || '{}');
+    if (saved && typeof saved === 'object' && !Array.isArray(saved)) completedTopics = saved;
+  } catch (_) { completedTopics = {}; }
+  Object.keys(completedTopics).forEach(id => { if (!topicIds.includes(id)) delete completedTopics[id]; });
+  const topicProgress = document.createElement('div');
+  topicProgress.className = 'topic-progress-display';
+  topicProgress.setAttribute('aria-live', 'polite');
+  if (heroRight) heroRight.insertBefore(topicProgress, score || heroRight.firstChild);
+  const updateTopicCompletion = () => {
+    const completedCount = topicIds.filter(id => completedTopics[id]).length;
+    topicProgress.textContent = `Topics done: ${completedCount}/${topicIds.length}`;
+    $$('.nav-pill[data-topic-id]', firstNav).forEach(link => {
+      const done = !!completedTopics[link.dataset.topicId];
+      link.classList.toggle('done-pill', done);
+      let badge = $('.topic-done-mark', link);
+      if (done && !badge) {
+        badge = document.createElement('span');
+        badge.className = 'topic-done-mark';
+        badge.setAttribute('aria-hidden', 'true');
+        badge.innerHTML = icon('check');
+        link.appendChild(badge);
+      } else if (!done && badge) badge.remove();
+    });
+    $$('.topic-done-button').forEach(button => {
+      const done = !!completedTopics[button.dataset.topicId];
+      button.classList.toggle('done', done);
+      button.setAttribute('aria-pressed', String(done));
+      button.innerHTML = `${icon(done ? 'check' : 'box')}<span>${done ? 'Done' : 'Mark done'}</span>`;
+      button.title = done ? 'Mark this topic as not done' : 'Mark this topic as done';
+    });
+  };
+  notesSections.forEach(section => {
+    const header = $('.section-header', section);
+    if (!header) return;
+    const actions = document.createElement('span');
+    actions.className = 'topic-header-actions';
+    const button = document.createElement('button');
+    button.className = 'topic-done-button';
+    button.type = 'button';
+    button.dataset.topicId = section.id;
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (completedTopics[section.id]) delete completedTopics[section.id];
+      else completedTopics[section.id] = true;
+      try { localStorage.setItem(topicCompletionKey, JSON.stringify(completedTopics)); } catch (_) { }
+      updateTopicCompletion();
+    });
+    const chevron = $('.chevron', header);
+    if (chevron) { header.insertBefore(actions, chevron); actions.append(button, chevron); }
+    else { header.appendChild(actions); actions.appendChild(button); }
+  });
+  updateTopicCompletion();
 
   // Replace the old multi-row category strip with a wrapped, compact notes navigator.
   // Bind section navigation only to the top-level topic links. The More topics
