@@ -1913,13 +1913,14 @@
             class="t">Wall</span></a><a class="nav-pill" href="#cacheorg"><span class="num">22</span><span
             class="l">Cache Org</span><span class="s">Cache Org</span><span class="t">Cache</span></a><a
           class="nav-pill" href="#cachepolicy"><span class="num">23</span><span class="l">Policies &amp;
-            AMAT</span><span class="s">AMAT</span><span class="t">AMAT</span></a><a class="nav-pill"
-          href="#verilog"><span class="num">24</span><span class="l">Verilog Coding</span><span
+            AMAT</span><span class="s">AMAT</span><span class="t">AMAT</span></a><a class="nav-pill" href="#virtualmem"><span
+            class="num">24</span><span class="l">Virtual Memory &amp; TLB</span><span class="s">Virtual Mem</span><span class="t">VM</span></a><a class="nav-pill" href="#powermesi"><span
+            class="num">25</span><span class="l">Power Wall &amp; MESI</span><span class="s">Power/MESI</span><span class="t">MESI</span></a><a class="nav-pill"
+          href="#verilog"><span class="num">26</span><span class="l">Verilog Coding</span><span
             class="s">Verilog</span><span class="t">Vlog</span></a><a class="nav-pill" href="#codingguide"><span
-            class="num">25</span><span class="l">Coding Guide</span><span class="s">Guide</span><span
-            class="t">Guide</span></a><a class="nav-pill" href="#tables"><span class="num">26</span><span
-            class="l">Quick Tables</span><span class="s">Tables</span><span class="t">Tbl</span></a><a class="nav-pill"
-          href="#final"><span class="num">27</span><span class="l">Final Sheet</span><span class="s">Final</span><span
+            class="num">27</span><span class="l">Coding Guide</span><span class="s">Guide</span><span
+            class="t">Guide</span></a><a class="nav-pill" href="#tables"><span class="num">28</span><span class="l">Quick Tables</span><span class="s">Tables</span><span class="t">Tbl</span></a><a class="nav-pill"
+          href="#final"><span class="num">29</span><span class="l">Final Sheet</span><span class="s">Final</span><span
             class="t">Final</span></a></nav>
     </div>
     <main class="main" id="notesMain">
@@ -9790,6 +9791,101 @@ Stalls per instr = accesses_per_instr * <span class="fn">MR</span> * <span class
         </div>
       </div>
 
+      <div class="section" id="virtualmem">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title"><span class="ico"><svg class="i"><use href="#i-grid" /></svg></span> 24. Virtual Memory, Page Tables &amp; TLB <span class="section-tag">VPN · PFN · Translation · Page Faults</span></div>
+          <span class="chevron"><svg class="i"><use href="#i-chev" /></svg></span>
+        </div>
+        <div class="section-body">
+          <div class="callout callout-tip"><strong>The central idea:</strong> every process uses virtual addresses. The MMU translates each one into a physical RAM address, enforcing isolation and permissions on every instruction, load and store.</div>
+          <h3>Why addresses are virtual</h3>
+          <div class="cards">
+            <div class="card"><div class="card-label">Isolation</div><h4>Same address, different memory</h4><p>Process A and Process B can both use virtual address <code>0x1000</code>. Their page tables can map it to different physical frames, so one process cannot name the other's memory.</p></div>
+            <div class="card"><div class="card-label">Protection</div><h4>Permissions checked by hardware</h4><p>Page-table permission bits distinguish user from kernel pages and writable from read-only pages. An illegal access traps before it can corrupt another process or the OS.</p></div>
+            <div class="card"><div class="card-label">Capacity</div><h4>Memory is allocated on demand</h4><p>A process can reserve a large virtual address space without occupying the same amount of RAM. Physical frames are supplied only for pages that are actually resident.</p></div>
+          </div>
+          <div class="callout"><strong>Address path:</strong> CPU virtual address → MMU checks the TLB → on a miss, page-table walk → physical address → cache/RAM. The program itself never needs the physical frame number.</div>
+          <h3>Pages, frames and the page table</h3>
+          <p>Virtual memory is divided into fixed-size <strong>pages</strong>; physical RAM is divided into equal-size <strong>frames</strong>. With a 4 KiB page, every page fits exactly in any frame. The page offset is preserved while the page number is translated.</p>
+          <div class="table-wrap"><table><thead><tr><th>Virtual page</th><th>Page-table row</th><th>Example entry</th><th>Meaning</th></tr></thead><tbody>
+            <tr><td>VPN 0</td><td>0</td><td>PFN 3, V=1</td><td>Resident in physical frame 3</td></tr>
+            <tr><td>VPN 1</td><td>1</td><td>PFN 5, V=1</td><td>Resident in physical frame 5</td></tr>
+            <tr><td>VPN 2</td><td>2</td><td>V=0</td><td>Not resident; access may fault</td></tr>
+          </tbody></table></div>
+          <p>The VPN is implicit in the row number; each process has its own table. A Page Table Base Register (PTBR; x86 uses <code>CR3</code>) points to the current process's table. For fixed-size entries, <code>PTE address = PTBR + VPN × entry size</code>.</p>
+          <h3>What a page-table entry records</h3>
+          <div class="cards">
+            <div class="card"><div class="card-label">Location</div><h4>PFN</h4><p>The physical frame number that contains the virtual page when it is present.</p></div>
+            <div class="card"><div class="card-label">Presence</div><h4>Valid / present (V)</h4><p><code>V=1</code> means the page is in RAM. <code>V=0</code> means it is absent or unused; accessing a legal but absent page raises a page fault.</p></div>
+            <div class="card"><div class="card-label">Access rules</div><h4>W, U, NX</h4><p>Writable, user-accessible and no-execute bits control what the process can do with the page. Read-only code and kernel-only pages are common examples.</p></div>
+            <div class="card"><div class="card-label">Bookkeeping</div><h4>A and D</h4><p>Accessed (A) helps the OS identify recently used pages. Dirty (D) means the page was written and must be saved before eviction.</p></div>
+          </div>
+          <h3>Split and translate an address</h3>
+          <div class="callout"><strong>For a 32-bit virtual address and 4 KiB pages:</strong> page size = 4096 = 2<sup>12</sup> bytes, so offset = 12 low bits and VPN = 20 high bits. In hexadecimal, the last three digits are the offset.</div>
+          <p><code>VPN = VA ÷ page size</code> (integer part), <code>offset = VA mod page size</code>, then <code>PA = PFN × page size + offset</code>. Equivalently, replace the VPN with the PFN and copy the offset unchanged.</p>
+          <h3>Solved example — translate 0x2ABC</h3>
+          <div class="callout callout-tip"><strong>Given:</strong> 16-bit virtual address, 4 KiB pages, and page table entry VPN 2 → PFN 7.<br><strong>1.</strong> 4 KiB = 0x1000 bytes, so offset is the last 3 hex digits: <code>0xABC</code>.<br><strong>2.</strong> The remaining high hex digit gives VPN <code>0x2</code>.<br><strong>3.</strong> VPN 2 maps to PFN 7. Keep the offset: <strong>physical address = 0x7ABC</strong>.</div>
+          <h3>Solved example — page-table size</h3>
+          <div class="callout callout-tip"><strong>Given:</strong> 32-bit virtual addresses, 4 KiB pages, one 4-byte PTE per virtual page.<br>VPN bits = 32 − 12 = 20; entries = 2<sup>20</sup>; table size = 2<sup>20</sup> × 4 bytes = 2<sup>22</sup> bytes = <strong>4 MiB per process</strong> for a simple single-level table. Most address spaces are sparse, so multi-level page tables allocate lower-level tables only for used regions.</div>
+          <h3>TLB — cache the translations</h3>
+          <p>A page-table walk reads memory before the CPU can access the requested data. The <strong>Translation Lookaside Buffer</strong> (TLB) is a small, fast cache of recent VPN → PFN mappings, usually tagged with an address-space identifier. A TLB hit avoids the page-table walk; a miss is not automatically a page fault.</p>
+          <div class="table-wrap"><table><thead><tr><th>Outcome</th><th>What happens</th><th>Typical relative cost</th></tr></thead><tbody>
+            <tr><td>TLB hit</td><td>Find PFN, check permissions, access data</td><td>TLB lookup + normal memory path</td></tr>
+            <tr><td>TLB miss, page present</td><td>Walk page table, fill TLB, retry access</td><td>Extra memory accesses</td></tr>
+            <tr><td>Page fault</td><td>Page absent; trap to OS, possibly fetch from disk</td><td>Millions of cycles in a disk-backed fault</td></tr>
+          </tbody></table></div>
+          <h3>Solved example — effective access time</h3>
+          <div class="callout callout-tip"><strong>Assume:</strong> memory access = 100 ns, TLB lookup = 10 ns, TLB hit rate = 95%, and a one-level page walk costs one extra 100 ns memory access.<br>Hit path = 10 + 100 = 110 ns. Miss path = 10 + 100 + 100 = 210 ns.<br><strong>EAT = 0.95(110) + 0.05(210) = 114.5 ns.</strong> Page-fault service time is not part of an ordinary TLB-miss calculation; account for it separately when a fault probability is supplied.</div>
+          <h3>What the OS does on a page fault</h3>
+          <ol><li>Hardware traps when the PTE says the page is absent.</li><li>The OS checks whether the address is legal. An illegal address becomes a segmentation/protection fault.</li><li>For a legal page, choose a free frame or a victim. If the victim is dirty, write it back.</li><li>Read the requested page into RAM; update the PTE and invalidate stale TLB entries.</li><li>Restart the faulting instruction. It now translates normally.</li></ol>
+          <div class="callout callout-warn"><strong>Keep these separate:</strong> a TLB miss means “translation not cached”; a page fault means “the page is not currently resident or the access is invalid.” A TLB miss can be resolved entirely in hardware/software without disk I/O.</div>
+          <h3>Common mistakes</h3><div class="cards"><div class="card"><h4>Changing the offset</h4><p>The page moves as a whole. Its byte offset never changes.</p></div><div class="card"><h4>Equating miss and fault</h4><p>First walk the page table. Only a non-present/invalid entry causes a page fault.</p></div><div class="card"><h4>Forgetting units</h4><p>Use page-size bytes consistently; 4 KiB is 4096 bytes = 0x1000.</p></div></div>
+          <h3>MCQ Practice — Virtual Memory</h3>
+          <div class="mcq-block" data-correct="1"><div class="mcq-q">Q1. With 4 KiB pages, how many low address bits form the page offset?</div><div class="mcq-options"><div class="opt" onclick="checkOpt(this)">A. 10</div><div class="opt" onclick="checkOpt(this)">B. 12</div><div class="opt" onclick="checkOpt(this)">C. 20</div><div class="opt" onclick="checkOpt(this)">D. 32</div></div><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans"><strong>12 bits.</strong> 4096 = 2<sup>12</sup>, so 12 bits select a byte within the page.</div></div>
+          <div class="mcq-block" data-correct="2"><div class="mcq-q">Q2. A TLB miss occurs, but the PTE is present and valid. What is the expected next step?</div><div class="mcq-options"><div class="opt" onclick="checkOpt(this)">A. Terminate the process</div><div class="opt" onclick="checkOpt(this)">B. Fetch the page from disk</div><div class="opt" onclick="checkOpt(this)">C. Walk the page table and refill the TLB</div><div class="opt" onclick="checkOpt(this)">D. Change the page offset</div></div><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans"><strong>C.</strong> The mapping exists in the page table; the miss only says it was not cached in the TLB.</div></div>
+          <h3>Solved Numerical — address bits</h3><div class="callout callout-tip"><strong>Question:</strong> A 48-bit virtual address uses 16 KiB pages. Find offset bits, VPN bits and entries in a flat table.<br>16 KiB = 2<sup>14</sup> bytes → offset = 14 bits; VPN = 48 − 14 = <strong>34 bits</strong>; flat table entries = 2<sup>34</sup>. This impractical size motivates hierarchical/sparse page tables.</div>
+          <h3>Unsolved Practice — TLB and paging</h3><div class="card"><div class="card-label">Try it yourself</div><p>A 32-bit address uses 1 KiB pages. A virtual page maps to PFN 0x35. Translate VA 0x12345. Show the VPN and offset.</p><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans">1 KiB = 0x400, so offset is 0x345 and VPN is 0x48. PA = PFN × 0x400 + offset = 0xD545.</div></div>
+        </div>
+      </div>
+
+      <div class="section" id="powermesi">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title"><span class="ico"><svg class="i"><use href="#i-chip" /></svg></span> 25. Power Wall, Multicore &amp; MESI <span class="section-tag">Dynamic Power · Cache Coherence</span></div>
+          <span class="chevron"><svg class="i"><use href="#i-chev" /></svg></span>
+        </div>
+        <div class="section-body">
+          <div class="callout callout-tip"><strong>Why the clock stopped climbing:</strong> shrinking transistors once made chips faster without raising heat density. When voltage scaling stalled and leakage grew, pushing frequency higher made power and heat rise too quickly. The industry shifted toward multiple moderate-clock cores—and then had to keep their private caches coherent.</div>
+          <h3>Moore's Law and Dennard scaling are different</h3>
+          <div class="cards"><div class="card"><div class="card-label">Moore's observation</div><h4>More transistors</h4><p>Transistor count per chip historically grew rapidly as manufacturing features shrank.</p></div><div class="card"><div class="card-label">Dennard scaling</div><h4>Similar power density</h4><p>When dimensions, voltage and current scaled together, more transistors and higher clocks could fit within roughly similar heat per unit area.</p></div><div class="card"><div class="card-label">The power wall</div><h4>Voltage stopped scaling</h4><p>Leakage and practical voltage limits broke the old bargain. More frequency and switching activity now meant difficult heat and energy costs.</p></div></div>
+          <h3>Dynamic power</h3><div class="formula">P = C × V<sup>2</sup> × f</div><p><strong>C</strong> is switched capacitance, <strong>V</strong> is supply voltage, and <strong>f</strong> is switching frequency. Voltage is squared, which makes voltage increases especially expensive. Leakage power adds to this dynamic-power model.</p>
+          <h3>Solved example — 20% faster clock</h3><div class="callout callout-tip">If both frequency and voltage rise by 20%, then <code>Pnew/Pold = 1.2 × (1.2)² = 1.728</code>. Dynamic power becomes <strong>1.728P</strong>, about a <strong>73% increase</strong> for 20% more clock speed.</div>
+          <h3>Solved example — two slower cores</h3><div class="callout callout-tip">Assume each core runs at 0.8V and 0.8f relative to one baseline core. Each uses <code>0.8² × 0.8 = 0.512P</code>. Two use <code>1.024P</code> total, while ideal parallel throughput is <code>2 × 0.8 = 1.6</code> baseline work units. This is about <strong>60% more parallel work at similar dynamic power</strong>. Serial code cannot use both cores; Amdahl's law limits its speedup.</div>
+          <h3>Why multicore creates a coherence problem</h3><p>Each core has a private cache. With write-back caching, a core may update its local copy while main memory and another core's cache still hold the old value. Without a protocol, the second core can read stale data.</p>
+          <div class="callout"><strong>Example:</strong> Both cores read <code>X=0</code>. Core 0 writes <code>X=5</code> in its cache. If Core 1 still reads its cached <code>0</code>, the system has violated the shared-memory expectation. Coherence protocols coordinate copies of each cache line.</div>
+          <h3>Write-update vs write-invalidate</h3><div class="table-wrap"><table><thead><tr><th>Policy</th><th>Writer does</th><th>Trade-off</th></tr></thead><tbody><tr><td>Write-update</td><td>Broadcasts the new value to other copies</td><td>Useful copies stay current, but every write consumes bus bandwidth</td></tr><tr><td>Write-invalidate</td><td>Invalidates other copies; writer obtains exclusive ownership</td><td>Reads can share; a later writer must invalidate before changing the line</td></tr></tbody></table></div>
+          <h3>MESI states</h3><p>Each cache line is tracked as <strong>M</strong>odified, <strong>E</strong>xclusive, <strong>S</strong>hared or <strong>I</strong>nvalid. The state answers whether this cache has a copy, whether others may have copies, and whether memory is current.</p>
+          <div class="table-wrap"><table><thead><tr><th>State</th><th>Copies elsewhere?</th><th>Memory current?</th><th>Read locally?</th><th>Write locally?</th></tr></thead><tbody>
+            <tr><td><strong>M — Modified</strong></td><td>No valid sharer</td><td>No; this cache is dirty owner</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td><strong>E — Exclusive</strong></td><td>No</td><td>Yes; clean</td><td>Yes</td><td>Yes, silently transitions to M</td></tr>
+            <tr><td><strong>S — Shared</strong></td><td>Other readers may have copies</td><td>Yes; clean</td><td>Yes</td><td>Only after invalidating other copies</td></tr>
+            <tr><td><strong>I — Invalid</strong></td><td>This cache's copy is unusable</td><td>Depends on owner</td><td>No</td><td>No; request ownership first</td></tr>
+          </tbody></table></div>
+          <div class="callout callout-warn"><strong>Memory mnemonic:</strong> M is the only dirty state; E and S are clean; I is unusable. A line may be E only when no other cache has it. Multiple caches may hold S copies.</div>
+          <h3>MESI transitions on a shared bus</h3><div class="table-wrap"><table><thead><tr><th>Event</th><th>Typical transition</th><th>What it means</th></tr></thead><tbody>
+            <tr><td>Read miss, nobody else has line</td><td>I → E</td><td>Fetch clean data; requester has sole copy</td></tr><tr><td>Read miss, another cache has clean line</td><td>I → S; E → S</td><td>Both caches share clean copies</td></tr><tr><td>Write to E</td><td>E → M</td><td>Sole owner can modify without bus invalidation</td></tr><tr><td>Write to S</td><td>S → M; other sharers → I</td><td>Issue an upgrade/invalidate transaction before writing</td></tr><tr><td>Another core reads an M line</td><td>M → S; requester → S</td><td>Owner supplies or writes back the latest data</td></tr><tr><td>Another core requests ownership</td><td>Current copy → I</td><td>Invalidate the old copy; modified owner supplies latest value if needed</td></tr>
+          </tbody></table></div>
+          <h3>Solved trace — two cores share X</h3><div class="callout callout-tip"><strong>Start:</strong> X=0 in memory; both lines are I.<br><strong>1.</strong> Core 0 reads X; it receives E (sole clean copy).<br><strong>2.</strong> Core 1 reads X; Core 0 changes E→S and Core 1 receives S.<br><strong>3.</strong> Core 0 writes X=5; it broadcasts an upgrade, invalidates Core 1 (S→I), then Core 0 becomes M. Core 0 now holds the newest value; memory may still contain 0.<br><strong>4.</strong> Core 1 reads X; Core 0 supplies/writes back 5 and changes M→S; Core 1 receives S. Both now read 5.<br><strong>5.</strong> Core 1 writes X=9; it invalidates Core 0 and becomes M. Core 1 owns the newest value.</div>
+          <h3>Snooping and directories</h3><div class="cards"><div class="card"><div class="card-label">Snooping</div><h4>Every cache listens</h4><p>Caches watch a shared bus for reads, invalidations and ownership requests. It is simple for a small number of cores but bus traffic does not scale indefinitely.</p></div><div class="card"><div class="card-label">Directory</div><h4>Track the sharers</h4><p>A directory records which caches hold each line and sends targeted messages. It scales to larger systems without broadcasting every event to every core.</p></div></div>
+          <h3>Common mistakes</h3><div class="cards"><div class="card"><h4>MESI is not write-through</h4><p>M can be newer than memory; the owner writes it back or supplies it when coherence requires.</p></div><div class="card"><h4>Shared does not mean modified</h4><p>S copies are clean and may be duplicated. A writer must first obtain exclusive ownership.</p></div><div class="card"><h4>More cores do not speed every program</h4><p>Only parallelizable work benefits; sequential portions remain a bottleneck.</p></div></div>
+          <h3>MCQ Practice — Power &amp; MESI</h3>
+          <div class="mcq-block" data-correct="2"><div class="mcq-q">Q1. If voltage rises by 10% and frequency is unchanged, dynamic power changes by approximately:</div><div class="mcq-options"><div class="opt" onclick="checkOpt(this)">A. 10% increase</div><div class="opt" onclick="checkOpt(this)">B. 20% increase</div><div class="opt" onclick="checkOpt(this)">C. 21% increase</div><div class="opt" onclick="checkOpt(this)">D. 100% increase</div></div><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans"><strong>C.</strong> Power scales as V², so 1.1²=1.21: a 21% increase.</div></div>
+          <div class="mcq-block" data-correct="0"><div class="mcq-q">Q2. Which MESI state indicates that this cache has the only copy and that the line is dirty?</div><div class="mcq-options"><div class="opt" onclick="checkOpt(this)">A. Modified</div><div class="opt" onclick="checkOpt(this)">B. Exclusive</div><div class="opt" onclick="checkOpt(this)">C. Shared</div><div class="opt" onclick="checkOpt(this)">D. Invalid</div></div><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans"><strong>A — Modified.</strong> The cache owns the only valid copy and memory may be stale.</div></div>
+          <div class="mcq-block" data-correct="1"><div class="mcq-q">Q3. A core writes a cache line currently in S. Under write-invalidate MESI, what must happen first?</div><div class="mcq-options"><div class="opt" onclick="checkOpt(this)">A. Write every byte to memory</div><div class="opt" onclick="checkOpt(this)">B. Invalidate other sharers and acquire ownership</div><div class="opt" onclick="checkOpt(this)">C. Change directly to E</div><div class="opt" onclick="checkOpt(this)">D. Fetch the page from disk</div></div><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans"><strong>B.</strong> The writer must invalidate shared copies before it can hold the line in M.</div></div>
+          <h3>Solved Numerical — power scaling</h3><div class="callout callout-tip">A core uses P at voltage V and frequency f. New design uses 0.9V and 0.9f. <code>Pnew/P = 0.9² × 0.9 = 0.729</code>. Dynamic power is <strong>72.9% of P</strong>, a 27.1% reduction per core.</div>
+          <h3>Unsolved Practice — coherence trace</h3><div class="card"><div class="card-label">Try it yourself</div><p>Initially X=1 in memory. Core 0 reads X, Core 1 reads X, Core 1 writes X=4, then Core 0 reads X. Give the MESI states after each step and the value Core 0 must receive.</p><button class="reveal-btn" onclick="reveal(this)">Show Answer</button><div class="mcq-ans">After C0 read: C0 E. After C1 read: C0 S, C1 S. C1 write: C1 issues invalidate, C0 I, C1 M with X=4. C0 read: C1 supplies/writes back 4 and becomes S; C0 receives S. Core 0 reads <strong>4</strong>.</div></div>
+        </div>
+      </div>
+
       <div class="section" id="verilog">
         <div class="section-header" onclick="toggleSection(this)">
           <div class="section-title"><span class="ico"><svg class="i">
@@ -13668,7 +13764,7 @@ Stalls per instr = accesses_per_instr * <span class="fn">MR</span> * <span class
         const txt = e => e.textContent.replace(/\s+/g, ' ').trim();
         const secs = $$('#notesMain .section[id]'), S = {}; secs.forEach(x => S[x.id] = x);
         const lab = { mcqs: 'Mixed Sprint' }; $$('.nav-pill').forEach(a => lab[a.getAttribute('href').slice(1)] = $('.l', a).textContent);
-        const LEC = ['boolean', 'simplification', 'kmap', 'demorgan', 'muxdemux', 'adders', 'numsys', 'seqbasics', 'registers', 'shiftregs', 'regfile', 'fsm', 'memory', 'architecture', 'riscmips', 'mipsprog', 'pipeline', 'hazards', 'branches', 'perf', 'memwall', 'cacheorg', 'cachepolicy'];
+        const LEC = ['boolean', 'simplification', 'kmap', 'demorgan', 'muxdemux', 'adders', 'numsys', 'seqbasics', 'registers', 'shiftregs', 'regfile', 'fsm', 'memory', 'architecture', 'riscmips', 'mipsprog', 'pipeline', 'hazards', 'branches', 'perf', 'memwall', 'cacheorg', 'cachepolicy', 'virtualmem', 'powermesi'];
         const hubQ = [], hubN = [];
         $$('table').forEach(t => { const w = document.createElement('div'); w.className = 'tw'; t.replaceWith(w); w.appendChild(t) });
         const chunk = h => { const a = []; let n = h.nextElementSibling; while (n && n.tagName !== 'H3') { a.push(n); n = n.nextElementSibling } return a };
@@ -13712,7 +13808,7 @@ Stalls per instr = accesses_per_instr * <span class="fn">MR</span> * <span class
         function updateLectureUI() {
           const doneList = Object.keys(completedLectures).filter(k => isLectureDone(k));
           const doneCount = doneList.length;
-          const totalLectures = LEC.length; // 23 lectures (excluding 24-27)
+          const totalLectures = LEC.length; // Lecture-tracked topics (reference sheets excluded)
           const progEl = $('#lecProgDisplay');
           if (progEl) progEl.textContent = `Completed: ${doneCount}/${totalLectures}`;
           $$('.lec-check-btn').forEach(btn => {
