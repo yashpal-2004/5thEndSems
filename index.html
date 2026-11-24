@@ -317,6 +317,19 @@
         margin-top: 16px
       }
     }
+    .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card:nth-child(3) { --tint: var(--orange); }
+    .card:nth-child(3) .icon { color: #8a6540; }
+    .planned { background: #f8f6f0; box-shadow: none; border-style: dashed; }
+    @media (max-width: 860px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 680px) {
+      .cards { grid-template-columns: 1fr; gap: 8px; }
+      .card { min-height: 0; padding: 13px 15px; }
+      .card-top { margin-bottom: 8px; }
+      .card h3 { font-size: 19px; margin: 0 0 3px; }
+      .card p { font-size: 12px; }
+      .card-bottom { padding-top: 8px; }
+    }
   </style>
 </head>
 
@@ -344,19 +357,26 @@
     // Add future study areas to this list; each card links to its folder's index.html.
     const studySpaces = [
       { title: 'Deep Learning Contest 2', description: 'Theory, numericals and MCQ practice across seven deep learning units.', folder: 'deep-learning-contest-2', label: 'DEEP LEARNING', icon: 'neural', detail: '7 units · quizzes · numericals' },
-      { title: 'MCA EndSem', description: 'A complete revision hub for digital logic, computer architecture and MIPS.', folder: 'mca-endsem', label: 'COMPUTER SCIENCE', icon: 'computer', detail: 'Lectures · code · practice' }
+      { title: 'MCA EndSem', description: 'A complete revision hub for digital logic, computer architecture and MIPS.', folder: 'mca-endsem', label: 'COMPUTER SCIENCE', icon: 'computer', detail: 'Lectures · code · practice' },
+      { title: 'CN EndSem', description: 'Computer Networks notes and exam revision will be added here.', folder: 'cn-endsem', label: 'COMPUTER NETWORKS', icon: 'network', detail: 'Folder to be added later', ready: false }
     ];
     const container = document.querySelector('#spaces');
     const icons = {
       neural: '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="m7.7 7.3 2.9 3.4m5.7-3.4-2.9 3.4m-3.4 2-2.9 3.4m7.2-3.4 2.9 3.4"/></svg>',
-      computer: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4m-5-9 3-3-3-3m6 6h4"/></svg>'
+      computer: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4m-5-9 3-3-3-3m6 6h4"/></svg>',
+      network: '<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m10.8 7.2-4.5 8.6m6.9-8.6 4.5 8.6M7.5 18h9"/></svg>'
     };
     const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     container.innerHTML = studySpaces.map(space => {
       const href = './' + encodeURIComponent(space.folder).replace(/%2F/gi, '/') + '/index.html';
-      return `<a class="card" href="${href}"><div class="card-top"><span class="icon" aria-hidden="true">${icons[space.icon]}</span><span class="tag">${escapeHtml(space.label)}</span></div><h3>${escapeHtml(space.title)}</h3><p>${escapeHtml(space.description)}</p><div class="card-bottom"><span class="meta">${escapeHtml(space.detail)}</span><span class="open">Open space <span aria-hidden="true">→</span></span></div></a>`;
+      const planned = space.ready === false;
+      const tag = planned ? 'COMING SOON' : escapeHtml(space.label);
+      const card = `<div class="card-top"><span class="icon" aria-hidden="true">${icons[space.icon]}</span><span class="tag">${tag}</span></div><h3>${escapeHtml(space.title)}</h3><p>${escapeHtml(space.description)}</p><div class="card-bottom"><span class="meta">${escapeHtml(space.detail)}</span>${planned ? '' : '<span class="open">Open space <span aria-hidden="true">→</span></span>'}</div>`;
+      return planned
+        ? `<article class="card planned" aria-label="${escapeHtml(space.title)}, coming soon">${card}</article>`
+        : `<a class="card" href="${href}">${card}</a>`;
     }).join('');
-    document.querySelector('#space-count').textContent = `${studySpaces.length} spaces`;
+    document.querySelector('#space-count').textContent = `${studySpaces.filter(space => space.ready !== false).length} active · ${studySpaces.filter(space => space.ready === false).length} planned`;
   </script>
 </body>
 
