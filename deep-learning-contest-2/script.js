@@ -232,7 +232,24 @@ if (Array.isArray(savedMock)) mockCards.forEach((card, index) => { if (savedMock
 // Dashboard presentation and controls
 const quizBank = document.createElement("div"); quizBank.id = "quiz-bank"; quizBank.hidden = true; document.querySelector("main").append(quizBank);
 const lessonSections = [...document.querySelectorAll("main > section.lesson, main > section.test-section")];
+const unitRoadmaps = {
+  "unit-1": ["Transfer learning", "Pretrained CNNs", "Feature extraction", "Fine-tuning", "Augmentation", "CNN limits and ViT"],
+  "unit-2": ["Sequential data", "RNN cell and hidden state", "Unrolling and shared weights", "Input/output patterns", "BPTT", "Vanishing and exploding gradients"],
+  "unit-3": ["Long-term dependency problem", "LSTM cell and gates", "GRU update/reset gates", "Bidirectional RNN", "Architecture comparison", "Parameter calculations"],
+  "unit-4": ["Text preprocessing", "Tokenization", "One-hot vectors", "Bag of Words", "TF and IDF", "Cosine similarity"],
+  "unit-5": ["Embedding matrix", "Dense word vectors", "CBOW", "Skip-gram", "Embedding applications", "Cosine similarity"],
+  "unit-6": ["Encoder–decoder", "Context vector", "Teacher forcing", "Greedy and beam decoding", "Bottleneck", "Attention motivation"],
+  "unit-7": ["Attention scores", "Bahdanau additive attention", "Luong multiplicative attention", "Softmax weights", "Context vector", "Self-attention preview"]
+};
 lessonSections.forEach((section, index) => {
+  if (unitRoadmaps[section.id]) {
+    const roadmap = document.createElement("div"); roadmap.className = "lecture-roadmap";
+    roadmap.setAttribute("aria-label", "Unit topic roadmap");
+    roadmap.innerHTML = `<span class="roadmap-title">Topic Roadmap</span><div class="roadmap-flow">${unitRoadmaps[section.id].map((name, i) => `${i ? '<span class="roadmap-arrow" aria-hidden="true">→</span>' : ''}<span class="roadmap-topic"></span>`).join("")}</div>`;
+    [...roadmap.querySelectorAll(".roadmap-topic")].forEach((node, i) => { node.textContent = unitRoadmaps[section.id][i]; });
+    const titleNode = section.querySelector("h2");
+    if (titleNode) titleNode.after(roadmap); else section.prepend(roadmap);
+  }
   const title = section.querySelector("h2")?.textContent || "Mock Test";
   const quizForms = [...section.querySelectorAll("form")];
   const quizButtons = quizForms.map(form => section.querySelector(`[data-quiz="${form.id}"]`)).filter(Boolean);

@@ -94,6 +94,33 @@
 
   const sections = $$('.main .section');
   const lectures = sections.filter(s => /^lec\d+$/.test(s.id));
+  const lectureRoadmaps = {
+    lec1: ['Network edge', 'Access networks', 'Packet core', 'Cables and infrastructure', 'Internet of networks'],
+    lec2: ['Circuit and packet switching', 'Store-and-forward', 'Statistical multiplexing', 'Delay components', 'Throughput and loss'],
+    lec3: ['Layering', 'OSI model', 'TCP/IP model', 'Encapsulation', 'PDUs and services'],
+    lec4: ['Hubs and switches', 'Routers and firewalls', 'Network topologies', 'Load balancers', 'Cloud architecture'],
+    lec5: ['Client/server and P2P', 'HTTP messages', 'Methods and status codes', 'HTTP versions', 'REST and CRUD'],
+    lec6: ['Cryptography goals', 'Symmetric and asymmetric keys', 'Certificates', 'TLS handshake', 'HTTPS'],
+    lec7: ['SMTP, IMAP and POP3', 'CDN purpose', 'Cache hit and miss', 'Caching layers', 'Cache behavior'],
+    lec8: ['DNS hierarchy', 'Recursive and authoritative servers', 'Lookup sequence', 'DNS records', 'Route 53'],
+    lec9: ['Ports and sockets', 'Multiplexing', 'UDP', 'TCP connection setup', 'Three-way handshake'],
+    lec10: ['Checksums and RTT', 'Reliable transfer', 'Stop-and-wait', 'Sliding window', 'Go-Back-N and Selective Repeat'],
+    lec11: ['Congestion window', 'Slow Start', 'AIMD', 'Fast retransmit/recovery', 'Congestion-control trace'],
+    lec12: ['Load-balancer role', 'NLB vs ALB', 'Health checks', 'TLS termination', 'Auto Scaling and availability'],
+    lec13: ['IPv4 structure', 'Classful addressing', 'Private ranges', 'CIDR prefixes', 'Address aggregation'],
+    lec14: ['Borrow host bits', 'Subnet masks', 'Network and broadcast', 'Usable host ranges', 'VPC subnet design'],
+    lec15: ['NAT and PAT', 'DHCP DORA', 'Route tables', 'Longest-prefix match', 'IGW vs NAT gateway'],
+    lec16: ['ICMP messages', 'Ping', 'Traceroute and TTL', 'IPv6 addressing', 'Dual-stack transition'],
+    lec17: ['Routing problem', 'Link-state and Dijkstra', 'Distance-vector and Bellman-Ford', 'Convergence', 'Count-to-infinity fixes']
+  };
+  lectures.forEach(section => {
+    const body = $('.section-body', section), topics = lectureRoadmaps[section.id];
+    if (!body || !topics) return;
+    const flow = document.createElement('div'); flow.className = 'lecture-roadmap';
+    flow.setAttribute('aria-label', 'Lecture topic roadmap');
+    flow.innerHTML = `<span class="roadmap-title">Topic Roadmap</span><div class="roadmap-flow">${topics.map((name, i) => `${i ? '<span class="roadmap-arrow" aria-hidden="true">→</span>' : ''}<span class="roadmap-topic">${name}</span>`).join('')}</div>`;
+    body.insertBefore(flow, body.firstChild);
+  });
   const allMcq = $('#allmcq');
   const numericalSection = $('#numericals');
   const mcqBank = $('#mcqs');

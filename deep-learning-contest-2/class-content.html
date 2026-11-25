@@ -2016,4 +2016,31 @@ if($('rc_d')){calcRnnC();calcTf();calcAtt();calcCbow();calcVit();}
 
 </script>
 
-</body></html>
+<script>
+(() => {
+  const flows = {
+    transfer: ['Transfer learning', 'Pretrained models', 'Feature extraction', 'Fine-tuning', 'Augmentation', 'CNN limits and ViT'],
+    rnn: ['Sequential data', 'RNN cell and hidden state', 'Unrolling and shared weights', 'Input/output patterns', 'BPTT', 'Long-term dependencies'],
+    gated: ['Vanishing-gradient problem', 'LSTM cell and gates', 'GRU update/reset gates', 'Bidirectional RNN', 'Architecture comparison', 'Parameter calculations'],
+    textrep: ['Text pipeline', 'Preprocessing and tokens', 'One-hot vectors', 'Bag of Words', 'TF and IDF', 'Cosine similarity'],
+    embed: ['Embedding matrix', 'Dense word vectors', 'CBOW', 'Skip-gram', 'Applications and limits', 'Similarity calculations'],
+    seq2seq: ['Encoder–decoder', 'Context vector', 'Teacher forcing', 'Greedy and beam decoding', 'Context bottleneck', 'Attention motivation'],
+    attn: ['Attention scores', 'Bahdanau additive attention', 'Luong multiplicative attention', 'Softmax weights', 'Context vector', 'Self-attention preview']
+  };
+  const style = document.createElement('style');
+  style.textContent = '.lecture-roadmap{margin:0 0 1.2rem;padding:.8rem 1rem;background:var(--bg2,#eee9d7);border:1px solid var(--border,#e2dcc7);border-radius:6px}.roadmap-title{display:block;margin-bottom:.5rem;color:var(--text2,#787466);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.roadmap-flow{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem}.roadmap-topic{padding:.22rem .5rem;background:var(--bg,#fbf8ef);border:1px solid var(--border,#e2dcc7);border-radius:4px;font-size:.82rem;font-weight:600}.roadmap-arrow{color:var(--accent2,#8d6c22);font-weight:800}@media(max-width:520px){.lecture-roadmap{padding:.6rem}.roadmap-topic{padding:.18rem .35rem;font-size:.72rem}.roadmap-flow{gap:.28rem}}';
+  document.head.appendChild(style);
+  Object.entries(flows).forEach(([id, topics]) => {
+    const section = document.getElementById(id), body = section?.querySelector('.section-body');
+    if (!body) return;
+    const box = document.createElement('div'); box.className = 'lecture-roadmap'; box.setAttribute('aria-label', 'Lecture topic roadmap');
+    const label = document.createElement('span'); label.className = 'roadmap-title'; label.textContent = 'Topic Roadmap';
+    const flow = document.createElement('div'); flow.className = 'roadmap-flow';
+    topics.forEach((topic, index) => {
+      if (index) { const arrow = document.createElement('span'); arrow.className = 'roadmap-arrow'; arrow.setAttribute('aria-hidden', 'true'); arrow.textContent = '→'; flow.appendChild(arrow); }
+      const node = document.createElement('span'); node.className = 'roadmap-topic'; node.textContent = topic; flow.appendChild(node);
+    });
+    box.append(label, flow); body.insertBefore(box, body.firstChild);
+  });
+})();
+</script></body></html>
