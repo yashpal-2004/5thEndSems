@@ -4826,6 +4826,26 @@ if(window.ResizeObserver)new ResizeObserver(measure).observe($('#stick'));
 var secs=$$('.section[id]'),hub=$('#hub'),mainEl=$('main.main');
 var lectureIds=['lifecycle','slr','mlr','bgd','sgd','metrics','poly','biasvar','featsel','pca','reg','ts','logit','gdlog','scratch','codelab'];
 var lectureSecs=secs.filter(function(s){return lectureIds.indexOf(s.id)>=0;});
+var lectureRoadmaps={
+  lifecycle:['AI, ML and DL','Learning paradigms','Core prediction tasks','ML project lifecycle','Preprocessing'],
+  slr:['Linear model','Squared-error loss','Ordinary least squares','Residuals and fit','Manual and sklearn implementation'],
+  mlr:['Matrix model','Design matrix','Normal equation','Coefficient interpretation','Prediction'],
+  bgd:['Loss surface','Gradient derivation','Update rule','Learning rate','Convergence and implementation'],
+  sgd:['Batch gradient descent','Stochastic gradient descent','Mini-batch gradient descent','Update and epoch formulas','Algorithm comparison'],
+  metrics:['Regression metrics','Confusion matrix','Precision and recall','F1 and averaging','ROC and AUC'],
+  poly:['Polynomial features','Linear-regression assumptions','Residual diagnostics','Multicollinearity','Feature transformation'],
+  biasvar:['Bias and variance','Underfitting and overfitting','Train/validation diagnosis','Trade-off'],
+  featsel:['Relevant and redundant features','Filter methods','Wrapper methods','Subset evaluation'],
+  pca:['Centering and scaling','Covariance matrix','Eigenvectors and eigenvalues','Projection','Explained variance and k'],
+  reg:['Overfitting and coefficient size','Ridge L2','Lasso L1','Ridge vs Lasso','Regularization strength'],
+  ts:['Trend, seasonality and noise','Stationarity','Lags and differencing','AR and MA models','ACF/PACF and forecasting'],
+  logit:['Classification and probability','Likelihood and MLE','Sigmoid and log-odds','Bernoulli likelihood','Log-likelihood and BCE'],
+  gdlog:['Logistic objective','Gradient derivation','Vectorized update','Decision boundaries','Multiclass OVR and softmax'],
+  scratch:['Formula-to-code workflow','NumPy translation','Batch vs SGD','PCA implementation','Newton problems'],
+  codelab:['Lab workflow','Write a function','Predict output','Fill blanks','Find and fix bugs']
+};
+var roadmapStyle=document.createElement('style');roadmapStyle.textContent='.lecture-roadmap{margin:0 0 1rem;padding:.8rem 1rem;background:#EEE8D4;border:1px solid #E3DCC6;border-radius:2px}.roadmap-title{display:block;margin-bottom:.5rem;color:#6B665A;font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase}.roadmap-flow{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem}.roadmap-topic{padding:.22rem .48rem;background:#FDF8EC;border:1px solid #E3DCC6;border-radius:2px;font-size:.8rem;font-weight:500}.roadmap-arrow{color:#7451AE;font-weight:700}@media(max-width:600px){.lecture-roadmap{padding:.6rem}.roadmap-topic{padding:.18rem .32rem;font-size:.7rem}.roadmap-flow{gap:.25rem}}';document.head.appendChild(roadmapStyle);
+lectureSecs.forEach(function(section){var topics=lectureRoadmaps[section.id],body=$('.section-body',section);if(!topics||!body)return;var box=document.createElement('div');box.className='lecture-roadmap';box.setAttribute('aria-label','Lecture topic roadmap');var label=document.createElement('span');label.className='roadmap-title';label.textContent='Topic Roadmap';var flow=document.createElement('div');flow.className='roadmap-flow';topics.forEach(function(topic,index){if(index){var arrow=document.createElement('span');arrow.className='roadmap-arrow';arrow.setAttribute('aria-hidden','true');arrow.textContent='→';flow.appendChild(arrow);}var node=document.createElement('span');node.className='roadmap-topic';node.textContent=topic;flow.appendChild(node);});box.append(label,flow);body.insertBefore(box,body.firstChild);});
 var lecProgDisplay=document.createElement('div');lecProgDisplay.className='score-display lec-prog-display';lecProgDisplay.id='lecProgDisplay';lecProgDisplay.setAttribute('aria-live','polite');
 lecProgDisplay.style.color='var(--text)';lecProgDisplay.style.whiteSpace='nowrap';lecProgDisplay.style.fontFamily='var(--f-body)';lecProgDisplay.style.fontSize='.76rem';lecProgDisplay.style.fontWeight='500';
 var scoreDisplay=$('#scoreDisplay');if(scoreDisplay)scoreDisplay.parentNode.insertBefore(lecProgDisplay,scoreDisplay);
