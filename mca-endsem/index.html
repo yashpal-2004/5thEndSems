@@ -1741,6 +1741,52 @@
         background: #1F6B3A
       }
 
+      .lecture-roadmap {
+        margin: 0 0 1.25rem;
+        padding: .85rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg2);
+      }
+
+      .roadmap-title {
+        display: block;
+        margin-bottom: .55rem;
+        color: var(--text2);
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      .roadmap-flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .4rem;
+      }
+
+      .roadmap-topic {
+        padding: .25rem .5rem;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        background: var(--bg);
+        color: var(--text);
+        font-size: .82rem;
+        font-weight: 600;
+      }
+
+      .roadmap-arrow {
+        color: var(--accent2);
+        font-weight: 800;
+      }
+
+      @media (max-width: 600px) {
+        .lecture-roadmap { padding: .65rem; }
+        .roadmap-flow { gap: .3rem; }
+        .roadmap-topic { padding: .2rem .35rem; font-size: .72rem; }
+      }
+
       .lec-prog-display {
         background: var(--bg2);
         border: 1px solid var(--border);
@@ -13765,6 +13811,41 @@ Stalls per instr = accesses_per_instr * <span class="fn">MR</span> * <span class
         const secs = $$('#notesMain .section[id]'), S = {}; secs.forEach(x => S[x.id] = x);
         const lab = { mcqs: 'Mixed Sprint' }; $$('.nav-pill').forEach(a => lab[a.getAttribute('href').slice(1)] = $('.l', a).textContent);
         const LEC = ['boolean', 'simplification', 'kmap', 'demorgan', 'muxdemux', 'adders', 'numsys', 'seqbasics', 'registers', 'shiftregs', 'regfile', 'fsm', 'memory', 'architecture', 'riscmips', 'mipsprog', 'pipeline', 'hazards', 'branches', 'perf', 'memwall', 'cacheorg', 'cachepolicy', 'virtualmem', 'powermesi'];
+        const ROADMAP = {
+          boolean: ['Inputs', 'Truth tables', 'Boolean expressions', 'Circuit outputs'],
+          simplification: ['Boolean laws', 'De Morgan transformations', 'Expression reduction', 'Minimum-gate circuits'],
+          kmap: ['Canonical SOP/POS', 'K-map grouping', 'Minimized expression', 'Gate implementation'],
+          demorgan: ['Complement rules', 'De Morgan laws', 'NAND/NOR forms', 'Universal-gate circuits'],
+          muxdemux: ['MUX selection', 'Boolean implementation', 'DEMUX routing', 'Decoder comparison'],
+          adders: ['Half adder', 'Full adder', 'Ripple-carry adder', 'Carry propagation'],
+          numsys: ['Binary and hexadecimal', 'Signed representations', 'Sign extension', 'Overflow'],
+          seqbasics: ['Combinational vs sequential', 'Latches', 'Flip-flops', 'Setup, hold and metastability'],
+          registers: ['Register basics', 'Ripple counters', 'Synchronous counters', 'Next-state traces'],
+          shiftregs: ['Storage stages', 'Shift direction', 'Serial/parallel I/O', 'Applications'],
+          regfile: ['Register array', 'Read ports', 'Write port', 'CPU register conventions'],
+          fsm: ['Moore and Mealy', 'State diagram', 'Transition table', 'State encoding', 'Implementation'],
+          memory: ['SRAM and DRAM', 'Memory hierarchy', 'Locality', 'Memory wall', 'AMAT'],
+          architecture: ['Von Neumann', 'Harvard', 'Modified Harvard', 'Architecture comparison'],
+          riscmips: ['RISC and CISC', 'MIPS registers', 'Instruction formats', 'Opcodes and function codes'],
+          mipsprog: ['C-to-MIPS patterns', 'Arrays and loops', 'Address calculation', 'Program tracing'],
+          pipeline: ['Single-cycle datapath', 'Five pipeline stages', 'Pipeline registers', 'Control signals', 'CPI and speedup'],
+          hazards: ['Hazard taxonomy', 'RAW dependencies', 'Stalling and forwarding', 'Load-use delay', 'Scheduling'],
+          branches: ['Branch decision', 'Control penalty', 'Stall and flush', 'Branch prediction', 'Branch CPI'],
+          perf: ['CPU time equation', "Amdahl's law", 'Speedup ceiling', 'Performance calculations'],
+          memwall: ["Moore's Law", 'Memory latency gap', 'SRAM and DRAM', 'Locality', 'Cache hierarchy', 'AMAT'],
+          cacheorg: ['Memory blocks', 'Address fields', 'Cache mapping', 'Associativity', 'Replacement', 'Miss types'],
+          cachepolicy: ['Replacement policies', 'Write policies', 'Write misses', 'Multi-level AMAT'],
+          virtualmem: ['Virtual and physical addresses', 'Pages and frames', 'Page-table translation', 'TLB', 'Page faults'],
+          powermesi: ['Dennard scaling', 'Power wall', 'Multicore', 'Cache coherence', 'MESI states', 'Snooping and directories']
+        };
+        LEC.forEach(id => {
+          const body = $('.section-body', S[id]), topics = ROADMAP[id];
+          if (!body || !topics) return;
+          const flow = document.createElement('div'); flow.className = 'lecture-roadmap';
+          flow.setAttribute('aria-label', 'Lecture topic roadmap');
+          flow.innerHTML = `<span class="roadmap-title">Topic Roadmap</span><div class="roadmap-flow">${topics.map((name, i) => `${i ? '<span class="roadmap-arrow" aria-hidden="true">→</span>' : ''}<span class="roadmap-topic">${esc(name)}</span>`).join('')}</div>`;
+          body.insertBefore(flow, body.firstChild);
+        });
         const hubQ = [], hubN = [];
         $$('table').forEach(t => { const w = document.createElement('div'); w.className = 'tw'; t.replaceWith(w); w.appendChild(t) });
         const chunk = h => { const a = []; let n = h.nextElementSibling; while (n && n.tagName !== 'H3') { a.push(n); n = n.nextElementSibling } return a };
