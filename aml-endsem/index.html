@@ -4824,6 +4824,12 @@ function measure(){var h=$('#stick').offsetHeight;document.documentElement.style
 window.addEventListener('resize',measure);
 if(window.ResizeObserver)new ResizeObserver(measure).observe($('#stick'));
 var secs=$$('.section[id]'),hub=$('#hub'),mainEl=$('main.main');
+var lectureIds=['lifecycle','slr','mlr','bgd','sgd','metrics','poly','biasvar','featsel','pca','reg','ts','logit','gdlog','scratch','codelab'];
+var lectureSecs=secs.filter(function(s){return lectureIds.indexOf(s.id)>=0;});
+var lecProgDisplay=document.createElement('div');lecProgDisplay.className='score-display lec-prog-display';lecProgDisplay.id='lecProgDisplay';lecProgDisplay.setAttribute('aria-live','polite');
+lecProgDisplay.style.color='var(--text)';lecProgDisplay.style.whiteSpace='nowrap';lecProgDisplay.style.fontFamily='var(--f-body)';lecProgDisplay.style.fontSize='.76rem';lecProgDisplay.style.fontWeight='500';
+var scoreDisplay=$('#scoreDisplay');if(scoreDisplay)scoreDisplay.parentNode.insertBefore(lecProgDisplay,scoreDisplay);
+secs.forEach(function(s){if(lectureIds.indexOf(s.id)<0){var box=$('.donebox',s);if(box)box.remove();}});
 function showSec(id,noScroll){if(!document.getElementById(id)||secs.map(function(s){return s.id}).indexOf(id)<0)id=secs[0].id;
   hub.hidden=true;mainEl.hidden=false;$('#hubBtn').lastChild.textContent=' Practice Hub';
   secs.forEach(function(s){s.classList.toggle('on',s.id===id);});
@@ -4845,8 +4851,8 @@ document.addEventListener('click',function(e){var tab=e.target.closest('.tab[dat
 function showTab(tabEl,targetId){var bar=tabEl.parentElement;$$('.tab',bar).forEach(function(t){t.classList.remove('active');var m=t.getAttribute('data-sub')||'';if(m){var c=document.getElementById(m);if(c)c.classList.remove('active');}});tabEl.classList.add('active');var tg=document.getElementById(targetId);if(tg)tg.classList.add('active');}
 document.addEventListener('click',function(e){var t=e.target.closest('.tab[data-sub]');if(t)showTab(t,t.getAttribute('data-sub'));});
 /* progress */
-function updateProgress(){var n=0;secs.forEach(function(s){var d=$('input.done',s),on=d&&d.checked;if(on)n++;var p=$('.nav-pill[data-sec="'+s.id+'"]');if(p)p.classList.toggle('done',!!on);});$('#progBar').style.width=(100*n/secs.length)+'%';}
-secs.forEach(function(s){var cb=$('input.done',s);if(!cb)return;cb.checked=store.get('aml-done-'+s.id)==='1';
+function updateProgress(){var n=0;lectureSecs.forEach(function(s){var d=$('input.done',s),on=d&&d.checked;if(on)n++;var p=$('.nav-pill[data-sec="'+s.id+'"]');if(p)p.classList.toggle('done',!!on);});lecProgDisplay.textContent='Completed: '+n+'/'+lectureSecs.length;$('#progBar').style.width=(100*n/lectureSecs.length)+'%';}
+lectureSecs.forEach(function(s){var cb=$('input.done',s);if(!cb)return;cb.checked=store.get('aml-done-'+s.id)==='1';
   cb.addEventListener('click',function(e){e.stopPropagation();});cb.addEventListener('change',function(){store.set('aml-done-'+s.id,cb.checked?'1':'0');updateProgress();});
   cb.parentElement.addEventListener('click',function(e){e.stopPropagation();});});
 updateProgress();
