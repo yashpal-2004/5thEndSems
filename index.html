@@ -317,7 +317,8 @@
         margin-top: 16px
       }
     }
-    .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .cards { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    @media (max-width: 1500px) { .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     .card:nth-child(3) { --tint: var(--orange); }
     .card:nth-child(3) .icon { color: #8a6540; }
     .planned { background: #f8f6f0; box-shadow: none; border-style: dashed; }
