@@ -348,3 +348,5 @@ td { border-color: var(--border) !important; }
   .stack-name { min-width: 0; }
   .footer { padding: 12px 8px !important; }
 }
+
+.home-dashboard-link{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;color:#fff;background:#2C2C2C;border:1px solid #2C2C2C;border-radius:2px;text-decoration:none;font-size:13px;white-space:nowrap}.home-dashboard-link:hover{color:#151515;background:#FFBB1E;border-color:#FFBB1E}.home-dashboard-link svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
