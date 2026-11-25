@@ -317,22 +317,57 @@
         margin-top: 16px
       }
     }
-    .cards { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-    @media (max-width: 1500px) { .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-    .card:nth-child(3) { --tint: var(--orange); }
-    .card:nth-child(3) .icon { color: #8a6540; }
-    .planned { background: #f8f6f0; box-shadow: none; border-style: dashed; }
-    @media (max-width: 1250px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 860px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 680px) {
-      .cards { grid-template-columns: 1fr; gap: 8px; }
-      .card { min-height: 0; padding: 13px 15px; }
-      .card-top { margin-bottom: 8px; }
-      .card h3 { font-size: 19px; margin: 0 0 3px; }
-      .card p { font-size: 12px; }
-      .card-bottom { padding-top: 8px; }
+    .shell{padding:clamp(16px,3.5vh,34px) clamp(18px,6.5vw,72px)}
+    .intro{margin:clamp(18px,3vh,32px) 0 clamp(16px,2.5vh,24px)}
+    .intro h1{font-size:clamp(44px,6vw,68px);margin:9px 0 10px}
+    .cards{grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(2,minmax(150px,1fr));gap:13px}
+    .card{grid-column:span 4;min-height:0;padding:18px;border-radius:15px}
+    .card:first-child{grid-row:span 2;background:#f3f7f0}
+    .card:nth-child(2){background:#f5f3fb}
+    .card:nth-child(3){background:#fbf4eb}
+    .card:nth-child(4){background:#f1f7f5}
+    .card:nth-child(5){background:#f7f4ed}
+    .card h3{font-size:clamp(18px,1.7vw,23px);margin:17px 0 5px}
+    .card p{font-size:12px;line-height:1.45}
+    .card-bottom{padding-top:12px}
+    .footer{margin-top:clamp(12px,2vh,20px)}
+    @media(max-width:1100px){
+      .shell{padding:18px 24px}
+      .intro{margin:18px 0}
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(108px,1fr));gap:10px}
+      .card{grid-column:auto;padding:15px}
+      .card:first-child{grid-column:1;grid-row:span 2}
+      .card h3{font-size:19px;margin:12px 0 4px}
+      .card p{font-size:12px}
     }
-  </style>
+    @media(max-width:680px){
+      .shell{padding:14px 14px 12px}
+      .topbar{min-height:24px}
+      .intro{margin:14px 0 12px}
+      .intro h1{font-size:40px;line-height:.94;margin:7px 0 8px}
+      .intro p{font-size:13px;line-height:1.35;max-width:34em}
+      .kicker{font-size:9px}
+      .section-head{margin-bottom:7px}
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:7px}
+      .card,.card:first-child{grid-column:auto;grid-row:auto;min-height:0;padding:10px;border-radius:12px}
+      .card:first-child{grid-column:1/-1}
+      .card-top{margin:0 0 5px}
+      .icon{width:29px;height:29px;border-radius:9px}
+      .icon svg{width:17px;height:17px}
+      .tag{font-size:8px;padding:4px 6px;letter-spacing:.025em}
+      .card h3{font-size:16px;line-height:1.12;margin:0 0 2px;letter-spacing:-.04em}
+      .card p,.meta{display:none}
+      .card-bottom{padding-top:3px}
+      .open{font-size:10px;gap:4px}
+      .footer{margin-top:9px;padding-top:7px;font-size:8px}
+    }
+    @media(max-height:700px) and (min-width:681px){
+      .shell{padding-top:12px;padding-bottom:12px}
+      .intro{margin:12px 0}
+      .intro h1{font-size:46px}
+      .cards{grid-template-rows:repeat(2,minmax(125px,1fr))}
+      .footer{margin-top:10px;padding-top:8px}
+    }  </style>
 </head>
 
 <body>
@@ -360,7 +395,7 @@
     const studySpaces = [
       { title: 'Deep Learning Contest 2', description: 'Theory, numericals and MCQ practice across seven deep learning units.', folder: 'deep-learning-contest-2', label: 'DEEP LEARNING', icon: 'neural', detail: '7 units · quizzes · numericals' },
       { title: 'MCA EndSem', description: 'A complete revision hub for digital logic, computer architecture and MIPS.', folder: 'mca-endsem', label: 'Modern Computer Architecture', icon: 'computer', detail: 'Lectures · code · practice' },
-      { title: 'MCA Contest 2', description: 'A beginner-friendly revision guide for Computer Architecture Contest 2.', folder: 'mca-contest-2', label: 'COMPUTER ARCHITECTURE', icon: 'computer', detail: 'Topic notes · worked practice' },
+      { title: 'MCA Contest 2', description: 'A beginner-friendly revision guide for Computer Architecture Contest 2.', folder: 'mca-contest-2', label: 'Modern COMPUTER ARCHITECTURE', icon: 'computer', detail: 'Topic notes · worked practice' },
       { title: 'CN EndSem', description: 'Computer Networks notes and exam revision in one place.', folder: 'cn-endsem', label: 'COMPUTER NETWORKS', icon: 'network', detail: 'Lectures · quizzes · numericals' },
       { title: 'AML EndSem', description: 'Advanced Machine Learning notes and exam revision across 16 lectures.', folder: 'aml-endsem', label: 'MACHINE LEARNING', icon: 'neural', detail: '16 lectures · code · practice hub' }
     ];
