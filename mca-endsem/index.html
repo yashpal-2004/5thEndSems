@@ -13721,7 +13721,7 @@ Stalls per instr = accesses_per_instr * <span class="fn">MR</span> * <span class
     </main>
     <main class="main" id="map" hidden>
       <div class="tm-head">
-        <h2>Topic Map</h2><span class="tm-sub">All 27 topics from the navigation bar, grouped by category. Independent
+        <h2>Topic Map</h2><span class="tm-sub">All 29 topics from the navigation bar, grouped by category. Independent
           topics are listed at the end.</span>
       </div>
       <div id="tmFlow"></div>
@@ -13934,7 +13934,7 @@ Stalls per instr = accesses_per_instr * <span class="fn">MR</span> * <span class
           const a = ev.target.closest('a[href^="#"]'); if (!a) return; const id = a.getAttribute('href').slice(1); if (S[id] || id === 'mcqs') { ev.preventDefault(); go(id) }
         });
         addEventListener('hashchange', () => { const id = location.hash.slice(1); if (S[id] || id === 'mcqs') go(id) });
-        const GRP = [['A', 'Boolean Algebra & Simplification', 'The algebra and minimisation tools behind every digital circuit.', ['boolean', 'simplification', 'kmap', 'demorgan']], ['B', 'Combinational Circuits', 'Circuits whose output depends only on the current inputs.', ['muxdemux', 'adders']], ['C', 'Sequential Logic & State', 'Circuits that remember: latches, flip-flops, registers, counters and state machines.', ['seqbasics', 'registers', 'shiftregs', 'regfile', 'fsm']], ['D', 'Memory Systems & Caches', 'How data is stored and why a memory hierarchy is needed.', ['memory', 'memwall', 'cacheorg', 'cachepolicy']], ['E', 'Architecture, ISA & MIPS', 'How a computer is organised and how programs talk to it.', ['architecture', 'riscmips', 'mipsprog']], ['F', 'Pipelining', 'Overlapping instructions and fixing the collisions that result.', ['pipeline', 'hazards', 'branches']], ['G', 'Verilog & HDL Coding', 'Describing the circuits above in code.', ['verilog', 'codingguide']]];
+        const GRP = [['A', 'Boolean Algebra & Simplification', 'The algebra and minimisation tools behind every digital circuit.', ['boolean', 'simplification', 'kmap', 'demorgan']], ['B', 'Combinational Circuits', 'Circuits whose output depends only on the current inputs.', ['muxdemux', 'adders']], ['C', 'Sequential Logic & State', 'Circuits that remember: latches, flip-flops, registers, counters and state machines.', ['seqbasics', 'registers', 'shiftregs', 'regfile', 'fsm']], ['D', 'Memory Systems, Virtual Memory & Caches', 'How addresses are translated, data is stored, and cache copies stay coherent.', ['memory', 'memwall', 'cacheorg', 'cachepolicy', 'virtualmem', 'powermesi']], ['E', 'Architecture, ISA & MIPS', 'How a computer is organised and how programs talk to it.', ['architecture', 'riscmips', 'mipsprog']], ['F', 'Pipelining', 'Overlapping instructions and fixing the collisions that result.', ['pipeline', 'hazards', 'branches']], ['G', 'Verilog & HDL Coding', 'Describing the circuits above in code.', ['verilog', 'codingguide']]];
         const IND = [['numsys', 'Self-contained data representation (binary, hex, two’s complement). It supports Adders and MIPS but can be learned on its own.'], ['perf', 'A general performance model (CPU time, CPI, speedup). It applies to any design, not only to the pipeline.'], ['tables', 'A cross-topic reference sheet; it does not belong to one subject area.'], ['final', 'A last-minute summary of every topic; use it after the others.']];
         function buildMap() {
           const chev = '<svg class="i"><use href="#i-chev"/></svg>';
