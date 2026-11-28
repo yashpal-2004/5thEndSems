@@ -166,6 +166,8 @@
       align-items: center
     }
 
+    .card{position:relative}.external-open{position:absolute;top:16px;right:16px;z-index:2;display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);text-decoration:none}.external-open:hover{background:var(--green);border-color:#8aab90}.external-open svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
     .icon {
       display: grid;
       place-items: center;
@@ -409,11 +411,12 @@
     container.innerHTML = studySpaces.map(space => {
       const href = './' + encodeURIComponent(space.folder).replace(/%2F/gi, '/') + '/index.html';
       const planned = space.ready === false;
+      const external = space.title === "Deep Learning Contest 2" ? `<a class="external-open" href="https://nst5.vercel.app" target="_blank" rel="noopener noreferrer" aria-label="Open Deep Learning Contest 2 website in a new tab" title="Open website in new tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6m0-6-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg></a>` : "";
       const tag = planned ? 'COMING SOON' : escapeHtml(space.label);
       const card = `<div class="card-top"><span class="icon" aria-hidden="true">${icons[space.icon]}</span><span class="tag">${tag}</span></div><h3>${escapeHtml(space.title)}</h3><p>${escapeHtml(space.description)}</p><div class="card-bottom"><span class="meta">${escapeHtml(space.detail)}</span>${planned ? '' : '<span class="open">Open space <span aria-hidden="true">→</span></span>'}</div>`;
       return planned
-        ? `<article class="card planned" aria-label="${escapeHtml(space.title)}, coming soon">${card}</article>`
-        : `<a class="card" href="${href}">${card}</a>`;
+        ? `<article class="card planned" aria-label="${escapeHtml(space.title)}, coming soon">${card}${external}</article>`
+        : `<a class="card" href="${href}">${card}${external}</a>`;
     }).join('');
     document.querySelector('#space-count').textContent = `${studySpaces.filter(space => space.ready !== false).length} active · ${studySpaces.filter(space => space.ready === false).length} planned`;
   </script>
